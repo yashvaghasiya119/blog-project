@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 // Generate JWT Token
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ userId }, "yash", { expiresIn: '7d' });
 };
 
 // Generate OTP

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 require('dotenv').config({ path: './config.env' });
 
 const app = express();
@@ -25,9 +26,12 @@ const corsOptions = {
 };
 
 // Middleware
+app.use(fileUpload({
+  useTempFiles:true
+}))
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Handle preflight requests
@@ -70,9 +74,9 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
-
+console.log("--------------",process.env.MONGODB_URI);
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect('mongodb://localhost:27017/blogapp2')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 

@@ -72,7 +72,7 @@ const AllBlogs = () => {
           {/* Popular Hashtags */}
           <div className="hashtags-section">
             <h3>Popular Topics</h3>
-            <div className="hashtags-list">
+            {/* <div className="hashtags-list">
               {allHashtags.slice(0, 10).map((hashtag, index) => (
                 <button
                   key={index}
@@ -82,7 +82,7 @@ const AllBlogs = () => {
                   {hashtag}
                 </button>
               ))}
-            </div>
+            </div> */}
           </div>
         </section>
 

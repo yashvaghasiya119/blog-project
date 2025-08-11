@@ -1,39 +1,56 @@
 const Blog = require('../models/Blog');
 const User = require('../models/User');
+const cloudinary = require("cloudinary").v2
 
 // @desc    Create a new blog
 // @route   POST /api/blog
 // @access  Private
+
+cloudinary.config({
+    cloud_name: 'dkfhw2v5x',     // e.g., 'my-cloud'
+    api_key: '382521327277157',           // e.g., '1234567890'
+    api_secret: 'VBYrZ8DcakKpvlim-87cJH8Ap8g',     // e.g., 'abc123xyz456'
+  });
+
+
 const createBlog = async (req, res) => {
   try {
-    const { title, body, image, hashtags } = req.body;
+    const { title, body, hashtags } = req.body;
+    const imageFile = req.files?.image; // image key from frontend
+
+    let imageUrl = null;
+    if (imageFile) {
+      // Upload to Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+        folder: "blogs"
+      });
+      imageUrl = uploadResult.secure_url;
+    }
 
     const blog = new Blog({
       title,
       body,
-      image,
-      hashtags: hashtags || [],
-      author: req.user.userId
+      hashtags: typeof hashtags === "string" ? hashtags.split(",").map(tag => tag.trim()) : [],
+      author: req.user.userId,
+      image: imageUrl
     });
 
     await blog.save();
 
     // Populate author details
-    await blog.populate('author', 'firstname lastname');
+    await blog.populate("author", "firstname lastname");
 
     res.status(201).json({
-      message: 'Blog created successfully',
+      message: "Blog created successfully",
       blog
     });
   } catch (error) {
-    console.error('Create blog error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Create blog error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// @desc    Get all blogs
-// @route   GET /api/blog
-// @access  Public
+
 const getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find()
