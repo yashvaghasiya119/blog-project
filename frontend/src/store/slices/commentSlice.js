@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { getCommentsByPost, createComment as createCommentApi, updateComment as updateCommentApi, deleteComment as deleteCommentApi, getMyComments } from '../../api';
 import { toast } from 'react-toastify';
 
 // Async thunks
@@ -7,8 +7,8 @@ export const fetchCommentsByPost = createAsyncThunk(
   'comment/fetchCommentsByPost',
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/comment/${postId}`);
-      return response.data;
+      const response = await getCommentsByPost(postId);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
     }
@@ -19,8 +19,8 @@ export const createComment = createAsyncThunk(
   'comment/createComment',
   async (commentData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/comment', commentData);
-      return response.data;
+      const response = await createCommentApi(commentData);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create comment');
     }
@@ -31,8 +31,8 @@ export const updateComment = createAsyncThunk(
   'comment/updateComment',
   async ({ commentId, content }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/comment/${commentId}`, { content });
-      return response.data;
+      const response = await updateCommentApi(commentId, content);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update comment');
     }
@@ -43,7 +43,7 @@ export const deleteComment = createAsyncThunk(
   'comment/deleteComment',
   async (commentId, { rejectWithValue }) => {
     try {
-      await axios.delete(`/api/comment/${commentId}`);
+      await deleteCommentApi(commentId);
       return commentId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete comment');
@@ -55,8 +55,8 @@ export const fetchMyComments = createAsyncThunk(
   'comment/fetchMyComments',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/comment/user/my-comments');
-      return response.data;
+      const response = await getMyComments();
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch your comments');
     }

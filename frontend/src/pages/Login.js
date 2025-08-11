@@ -16,13 +16,16 @@ const Login = () => {
   const { loading, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    // Only redirect if user is authenticated and not loading
+    if (isAuthenticated && !loading) {
       navigate('/');
     }
+    
+    // Cleanup function to clear errors when component unmounts
     return () => {
       dispatch(clearError());
     };
-  }, [isAuthenticated, navigate, dispatch]);
+  }, [isAuthenticated, loading, navigate, dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -62,6 +65,11 @@ const Login = () => {
       await dispatch(login(formData));
     }
   };
+
+  // Don't render the form if user is already authenticated
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="auth-container" data-aos="fade-up">

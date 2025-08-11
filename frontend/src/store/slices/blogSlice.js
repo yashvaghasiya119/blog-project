@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { getBlogs, getBlogById, getMyBlogs, createBlogWithImage, updateBlogWithImage, deleteBlog as deleteBlogApi, searchBlogsByHashtags, getTrendingBlogs } from '../../api';
 import { toast } from 'react-toastify';
 
 // Async thunks
@@ -7,8 +7,8 @@ export const fetchAllBlogs = createAsyncThunk(
   'blog/fetchAllBlogs',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/blog');
-      return response.data;
+      const response = await getBlogs();
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch blogs');
     }
@@ -19,8 +19,8 @@ export const fetchSingleBlog = createAsyncThunk(
   'blog/fetchSingleBlog',
   async (blogId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/blog/${blogId}`);
-      return response.data;
+      const response = await getBlogById(blogId);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch blog');
     }
@@ -31,8 +31,8 @@ export const fetchMyBlogs = createAsyncThunk(
   'blog/fetchMyBlogs',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/blog/my-blogs');
-      return response.data;
+      const response = await getMyBlogs();
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch your blogs');
     }
@@ -41,10 +41,10 @@ export const fetchMyBlogs = createAsyncThunk(
 
 export const createBlog = createAsyncThunk(
   'blog/createBlog',
-  async (blogData, { rejectWithValue }) => {
+  async ({ blogData, imageFile }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/blog', blogData);
-      return response.data;
+      const response = await createBlogWithImage(blogData, imageFile);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create blog');
     }
@@ -53,10 +53,10 @@ export const createBlog = createAsyncThunk(
 
 export const updateBlog = createAsyncThunk(
   'blog/updateBlog',
-  async ({ blogId, blogData }, { rejectWithValue }) => {
+  async ({ blogId, blogData, imageFile }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/blog/${blogId}`, blogData);
-      return response.data;
+      const response = await updateBlogWithImage(blogId, blogData, imageFile);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update blog');
     }
@@ -67,7 +67,7 @@ export const deleteBlog = createAsyncThunk(
   'blog/deleteBlog',
   async (blogId, { rejectWithValue }) => {
     try {
-      await axios.delete(`/api/blog/${blogId}`);
+      await deleteBlogApi(blogId);
       return blogId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete blog');
@@ -79,8 +79,8 @@ export const searchByHashtags = createAsyncThunk(
   'blog/searchByHashtags',
   async (hashtags, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/blog/search/hashtags?hashtags=${hashtags}`);
-      return response.data;
+      const response = await searchBlogsByHashtags(hashtags);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to search blogs');
     }
@@ -91,8 +91,8 @@ export const fetchTrendingBlogs = createAsyncThunk(
   'blog/fetchTrendingBlogs',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/blog/trending');
-      return response.data;
+      const response = await getTrendingBlogs();
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch trending blogs');
     }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentUser } from './store/slices/authSlice';
@@ -27,13 +27,22 @@ import './App.css';
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated on app load
-    dispatch(getCurrentUser());
-  }, [dispatch]);
+    // Check if user is authenticated on app load only once
+    const token = localStorage.getItem('token');
+    if (token && !isAuthenticated && !initialCheckDone) {
+      dispatch(getCurrentUser()).finally(() => {
+        setInitialCheckDone(true);
+      });
+    } else {
+      setInitialCheckDone(true);
+    }
+  }, [dispatch, isAuthenticated, initialCheckDone]);
 
-  if (loading) {
+  // Show loading only during initial authentication check
+  if (!initialCheckDone || (loading && !isAuthenticated)) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>

@@ -9,9 +9,11 @@ const EditBlog = () => {
   const [formData, setFormData] = useState({
     title: '',
     body: '',
-    image: '',
     hashtags: ''
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [currentImageUrl, setCurrentImageUrl] = useState('');
   const [errors, setErrors] = useState({});
 
   const dispatch = useDispatch();
@@ -27,9 +29,9 @@ const EditBlog = () => {
       setFormData({
         title: singleBlog.title || '',
         body: singleBlog.body || '',
-        image: singleBlog.image || '',
         hashtags: singleBlog.hashtags ? singleBlog.hashtags.join(', ') : ''
       });
+      setCurrentImageUrl(singleBlog.image || '');
     }
   }, [singleBlog]);
 
@@ -44,6 +46,24 @@ const EditBlog = () => {
         [e.target.name]: ''
       });
     }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview('');
   };
 
   const validateForm = () => {
@@ -72,7 +92,7 @@ const EditBlog = () => {
           : []
       };
 
-      const result = await dispatch(updateBlog({ blogId: id, blogData }));
+      const result = await dispatch(updateBlog({ blogId: id, blogData, imageFile }));
       if (updateBlog.fulfilled.match(result)) {
         navigate('/my-blogs');
       }
@@ -122,19 +142,50 @@ const EditBlog = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="image" className="form-label">Image URL (Optional)</label>
+              <label htmlFor="image" className="form-label">Blog Image (Optional)</label>
+              
+              {/* Show current image if exists */}
+              {currentImageUrl && !imagePreview && (
+                <div className="current-image-container">
+                  <img 
+                    src={currentImageUrl} 
+                    alt="Current blog image" 
+                    className="current-image"
+                  />
+                  <small className="form-help">
+                    Current blog image
+                  </small>
+                </div>
+              )}
+              
               <input
-                type="url"
+                type="file"
                 id="image"
                 name="image"
-                value={formData.image}
-                onChange={handleChange}
+                accept="image/*"
+                onChange={handleImageChange}
                 className="form-control"
-                placeholder="Enter image URL from Cloudinary or other image hosting service"
               />
               <small className="form-help">
-                You can upload an image to Cloudinary and paste the URL here
+                Upload a new image file (JPG, PNG, GIF). Max size: 5MB. Leave empty to keep current image.
               </small>
+              
+              {imagePreview && (
+                <div className="image-preview-container">
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="image-preview"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="btn btn-sm btn-danger remove-image-btn"
+                  >
+                    Remove New Image
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="form-group">

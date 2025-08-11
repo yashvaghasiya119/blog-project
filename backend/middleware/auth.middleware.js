@@ -1,7 +1,15 @@
 const jwt = require('jsonwebtoken');
 
 const authenticateUser = (req, res, next) => {
-  const token = req.cookies?.usertoken;
+  // Check for token in Authorization header first (Bearer token)
+  let token = req.headers.authorization;
+  
+  if (token && token.startsWith('Bearer ')) {
+    token = token.slice(7); // Remove 'Bearer ' prefix
+  } else {
+    // Fallback to cookie token
+    token = req.cookies?.usertoken;
+  }
 
   if (!token) {
     return res.status(401).json({ message: 'User not authorized. No token found.' });

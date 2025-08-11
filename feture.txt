@@ -1,0 +1,30 @@
+1. Centralized API Configuration
+api.js - Main axios instance with:
+Base URL: http://localhost:5000 (your backend port)
+Automatic JWT token management
+Error handling with 401 redirects
+10-second timeout
+2. Specialized API Services
+userApi.js - All user operations (signup, login, logout, etc.)
+blogApi.js - Blog operations with image upload support
+commentApi.js - Comment operations
+index.js - Centralized exports
+3. Enhanced Blog Functionality
+Image Upload Support: Now handles both text and image files
+FormData Integration: Automatically switches between JSON and FormData
+Image Preview: Shows preview before upload
+Current Image Display: EditBlog shows existing images
+4. Updated Components
+CreateBlog: File upload instead of URL input
+EditBlog: Enhanced with image handling
+CSS Styling: Added styles for image previews
+5. Updated Redux Slices
+authSlice: Uses new API services
+blogSlice: Enhanced for image handling
+commentSlice: Uses new API services
+🔧 Key Features:
+Automatic Token Management - No more manual token handling
+Image Upload Support - Handles both text and file uploads
+Centralized Error Handling - Consistent across the app
+Easy Configuration - Change base URL, timeout, etc. in one place
+FormData Support - Automatically handles image uploads

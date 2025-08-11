@@ -27,16 +27,21 @@ const generateOTP = () => {
 // @access  Public
 const signup = async (req, res) => {
   try {
+    console.log('Signup request received:', { body: req.body, headers: req.headers });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { firstname, lastname, email, password } = req.body;
+    console.log('Processing signup for:', { firstname, lastname, email });
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
@@ -48,10 +53,13 @@ const signup = async (req, res) => {
       password
     });
 
+    console.log('Saving new user...');
     await user.save();
+    console.log('User saved successfully:', user._id);
 
     // Generate token
     const token = generateToken(user._id);
+    console.log('Token generated for user:', user._id);
 
     // Set cookie
     res.cookie('usertoken', token, {
@@ -60,18 +68,22 @@ const signup = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.status(201).json({
+    const response = {
       message: 'User created successfully',
+      token: token,
       user: {
         id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email
       }
-    });
+    };
+
+    console.log('Sending signup response:', { userId: user._id, hasToken: !!token });
+    res.status(201).json(response);
   } catch (error) {
     console.error('Signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -80,22 +92,30 @@ const signup = async (req, res) => {
 // @access  Public
 const login = async (req, res) => {
   try {
+    console.log('Login request received:', { body: req.body, headers: req.headers });
+    
     const { email, password } = req.body;
+    console.log('Processing login for:', { email });
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found for login:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('User found, checking password...');
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('Password verified, generating token...');
     // Generate token
     const token = generateToken(user._id);
+    console.log('Token generated for user:', user._id);
 
     // Set cookie
     res.cookie('usertoken', token, {
@@ -104,18 +124,22 @@ const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.json({
+    const response = {
       message: 'Login successful',
+      token: token,
       user: {
         id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email
       }
-    });
+    };
+
+    console.log('Sending login response:', { userId: user._id, hasToken: !!token });
+    res.json(response);
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

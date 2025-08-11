@@ -15,9 +15,9 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getAllBlogs);
-router.get('/:id', getSingleBlog);
-router.get('/search/hashtags', searchByHashtags);
 router.get('/trending', getTrendingBlogs);
+router.get('/search/hashtags', searchByHashtags);
+router.get('/:id', getSingleBlog);
 
 // Private routes
 router.post('/', authenticateUser, createBlog);
