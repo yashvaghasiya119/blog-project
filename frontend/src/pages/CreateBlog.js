@@ -257,6 +257,7 @@ const CreateBlog = () => {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true
       });
       console.log("🚀 ~ handleSubmit ~ res:", res)
       toast.success("Blog created successfully");

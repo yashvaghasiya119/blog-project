@@ -266,3 +266,40 @@
     gap: 0.5rem;
   }
 }
+
+.image-zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInBackground 0.3s forwards;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+@keyframes fadeInBackground {
+  to {
+    opacity: 1;
+  }
+}
+
+.zoomed-image {
+  width: 120vh;
+  height: auto;
+  opacity: 0;
+  animation: fadeInImage 0.3s forwards;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+}
+
+@keyframes fadeInImage {
+  to {
+    opacity: 1;
+  }
+}
