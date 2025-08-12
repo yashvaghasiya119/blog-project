@@ -288,7 +288,7 @@ const SingleBlog = () => {
       <img
         src={singleBlog.image}
         alt={singleBlog.title}
-        className="blog-image"
+        className="blog-image-single"
         onClick={handleImageClick}
         style={{ cursor: 'zoom-in' }}
       />

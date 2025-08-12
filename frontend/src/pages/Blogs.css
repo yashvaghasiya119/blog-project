@@ -226,6 +226,9 @@
   padding: 1rem 2rem;
   border-radius: 10px;
 }
+.blog-card{
+  text-decoration: none;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {

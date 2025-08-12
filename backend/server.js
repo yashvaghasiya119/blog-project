@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config();
 
 const app = express();
 

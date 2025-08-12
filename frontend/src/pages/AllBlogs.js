@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { fetchAllBlogs, searchByHashtags } from '../store/slices/blogSlice';
 import './Blogs.css';
 
@@ -9,6 +9,7 @@ const AllBlogs = () => {
   const [selectedHashtags, setSelectedHashtags] = useState([]);
   
   const dispatch = useDispatch();
+  
   const { blogs, loading } = useSelector((state) => state.blog);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ const AllBlogs = () => {
           {/* Popular Hashtags */}
           <div className="hashtags-section">
             <h3>Popular Topics</h3>
-            {/* <div className="hashtags-list">
+            <div className="hashtags-list">
               {allHashtags.slice(0, 10).map((hashtag, index) => (
                 <button
                   key={index}
@@ -82,7 +83,7 @@ const AllBlogs = () => {
                   {hashtag}
                 </button>
               ))}
-            </div> */}
+            </div>
           </div>
         </section>
 
@@ -111,7 +112,8 @@ const AllBlogs = () => {
           ) : (
             <div className="blogs-grid">
               {blogs.map((blog) => (
-                <div key={blog._id} className="blog-card" data-aos="fade-up">
+                <NavLink className="blog-card" to={`/blog/${blog._id}`} key={blog._id}>
+                  <div key={blog._id} className="blog-card" data-aos="fade-up">
                   {blog.image && (
                     <div className="blog-image">
                       <img src={blog.image} alt={blog.title} />
@@ -146,6 +148,7 @@ const AllBlogs = () => {
                     )}
                   </div>
                 </div>
+                </NavLink>
               ))}
             </div>
           )}
