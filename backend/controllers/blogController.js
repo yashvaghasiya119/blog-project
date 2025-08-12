@@ -102,41 +102,99 @@ const getMyBlogs = async (req, res) => {
 // @desc    Update blog
 // @route   PUT /api/blog/:id
 // @access  Private
+
+// const updateBlog = async (req, res) => {
+//   try {
+//     const { title, body, image, hashtags } = req.body;
+
+//     const blog = await Blog.findById(req.params.id);
+
+//     if (!blog) {
+//       return res.status(404).json({ message: 'Blog not found' });
+//     }
+
+//     // Check if user owns the blog
+//     if (blog.author.toString() !== req.user.userId) {
+//       return res.status(401).json({ message: 'Not authorized to update this blog' });
+//     }
+
+//     blog.title = title || blog.title;
+//     blog.body = body || blog.body;
+//     blog.image = image || blog.image;
+//     blog.hashtags = hashtags || blog.hashtags;
+//     blog.updatedAt = Date.now();
+
+//     await blog.save();
+
+//     // Populate author details
+//     await blog.populate('author', 'firstname lastname');
+
+//     res.json({
+//       message: 'Blog updated successfully',
+//       blog
+//     });
+//   } catch (error) {
+//     console.error('Update blog error:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
 const updateBlog = async (req, res) => {
   try {
-    const { title, body, image, hashtags } = req.body;
+    const { title, body, hashtags } = req.body;
+    const imageFile = req.files?.image; // If user uploaded a new image
 
+    // 1. Find the blog
     const blog = await Blog.findById(req.params.id);
-
     if (!blog) {
-      return res.status(404).json({ message: 'Blog not found' });
+      return res.status(404).json({ message: "Blog not found" });
     }
 
-    // Check if user owns the blog
+    // 2. Authorization check
     if (blog.author.toString() !== req.user.userId) {
-      return res.status(401).json({ message: 'Not authorized to update this blog' });
+      return res.status(401).json({ message: "Not authorized to update this blog" });
     }
 
+    // 3. Handle new image upload
+    if (imageFile) {
+      // Optional: remove old image from Cloudinary if needed
+      if (blog.image) {
+        try {
+          const publicId = blog.image.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(`blogs/${publicId}`);
+        } catch (err) {
+          console.warn("Old image removal failed:", err.message);
+        }
+      }
+
+      const uploadResult = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+        folder: "blogs"
+      });
+      blog.image = uploadResult.secure_url;
+    }
+
+    // 4. Update fields
     blog.title = title || blog.title;
     blog.body = body || blog.body;
-    blog.image = image || blog.image;
-    blog.hashtags = hashtags || blog.hashtags;
+    blog.hashtags = typeof hashtags === "string"
+      ? hashtags.split(",").map(tag => tag.trim())
+      : (Array.isArray(hashtags) ? hashtags : blog.hashtags);
     blog.updatedAt = Date.now();
 
+    // 5. Save & populate author details
     await blog.save();
-
-    // Populate author details
-    await blog.populate('author', 'firstname lastname');
+    await blog.populate("author", "firstname lastname");
 
     res.json({
-      message: 'Blog updated successfully',
+      message: "Blog updated successfully",
       blog
     });
   } catch (error) {
-    console.error('Update blog error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Update blog error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // @desc    Delete blog
 // @route   DELETE /api/blog/:id

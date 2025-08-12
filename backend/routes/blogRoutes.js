@@ -17,11 +17,13 @@ const router = express.Router();
 router.get('/', getAllBlogs);
 router.get('/trending', getTrendingBlogs);
 router.get('/search/hashtags', searchByHashtags);
-router.get('/:id', getSingleBlog);
 
 // Private routes
 router.post('/', authenticateUser, createBlog);
 router.get('/my-blogs', authenticateUser, getMyBlogs);
+
+// Keep these routes at the end to avoid conflicts
+router.get('/:id', getSingleBlog);
 router.put('/:id', authenticateUser, updateBlog);
 router.delete('/:id', authenticateUser, deleteBlog);
 
