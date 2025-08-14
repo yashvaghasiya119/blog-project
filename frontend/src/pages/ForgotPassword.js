@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { forgotPassword, clearError } from '../store/slices/authSlice';
 import './Auth.css';
 
@@ -10,7 +10,7 @@ const ForgotPassword = () => {
 
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.auth);
-
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setEmail(e.target.value);
     if (errors.email) {
@@ -35,7 +35,11 @@ const ForgotPassword = () => {
     e.preventDefault();
     
     if (validateForm()) {
-      await dispatch(forgotPassword(email));
+     let d=  await dispatch(forgotPassword(email));
+     console.log(d.payload.message)
+     if(d.payload.message="OTP sent to your email"){
+      navigate('/reset-password');
+     }
     }
   };
 
